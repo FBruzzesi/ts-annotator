@@ -1,0 +1,12 @@
+#app-header > * {
+    background-color: rgb(78, 76, 76);
+    height: 75px
+}
+
+#app-title > * {
+    color: white;
+}
+
+#gh-link {
+    white-space: nowrap;
+}

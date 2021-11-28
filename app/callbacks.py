@@ -1,19 +1,29 @@
 import dash
 from dash import dash_table
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output, State, ALL
 import pandas as pd
 
 from app import app
 
+colors = ["indianred", "seagreen", "mediumblue", "goldenrod"]
+
 @app.callback(
     Output("graph-pic", "figure"),
-    Input("color", "value"),
+    Input({"type": "label-color-button", "index": ALL}, "n_clicks_timestamp"),
     State("graph-pic", "figure"),
     prevent_initial_call=True,
 )
-def on_color_change(color, figure):
+def on_color_change(color_idx, figure):
     """Changes color of the shape to draw in the graph"""
     
+    if color_idx is None: _idx = 0
+    else:
+        _idx = max(
+            enumerate(color_idx),
+            key=lambda t: 0 if t[1] is None else t[1],
+        )[0]
+
+    color = colors[_idx]
     figure["layout"]['newshape'] = {"line": {"color": color, "width": 3}}
 
     return figure
