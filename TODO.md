@@ -1,8 +1,8 @@
 # Activities
 ## Repo
-- [❌] Add requirements.txt file
+- [✔️] Add requirements.txt file
 - [❌] Precommit hooks
-- [❌] Add dockerfile for reproducibility
+- [✔️] Add dockerfile for reproducibility
 ## App
 - Components:
   - [❌] Instruction 
@@ -16,7 +16,7 @@
 - Restyling
   - [❌] Plot
   - [❌] Datatable
-  - [❌] Components
+  - [🚧] Components
 
 # Legend
 - [✔️] **Done**

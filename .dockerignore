@@ -1,0 +1,39 @@
+# Versioning
+.git
+.gitignore
+
+# Python cache
+*/__pycache__ 
+*/.pytest_cache
+*/.ipynb_checkpoints 
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Folders
+notebooks
+docker
+
+# Extra files
+README.md
+TODO.md
+.flake8
+Makefile
