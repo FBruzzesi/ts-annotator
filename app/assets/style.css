@@ -10,3 +10,8 @@
 #gh-link {
     white-space: nowrap;
 }
+
+.card {
+    margin: 1em 0 1em 0;
+    min-width: auto;
+}

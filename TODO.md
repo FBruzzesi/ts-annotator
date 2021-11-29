@@ -1,8 +1,8 @@
 # Activities
 ## Repo
 - [✔️] Add requirements.txt file
-- [❌] Precommit hooks
 - [✔️] Add dockerfile for reproducibility
+- [❌] Precommit hooks
 ## App
 - Components:
   - [❌] Instruction 

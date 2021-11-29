@@ -1,0 +1,13 @@
+colors:
+  - indianred
+  - seagreen
+  - mediumblue
+  - goldenrod
+  - indigo
+  
+graph_config:
+  modeBarButtonsToAdd:
+    - drawclosedpath
+    - drawcircle
+    - drawrect
+    # - eraseshape
