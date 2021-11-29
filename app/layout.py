@@ -17,7 +17,7 @@ y = np.random.randn(size)
 
 df = pd.DataFrame({'x': x, 'y': y})
 
-fig = px.scatter(data_frame=df, x="x", y="y")
+fig = px.line(data_frame=df, x="x", y="y")
 
 fig.update_layout(
     dragmode="drawrect",
@@ -117,17 +117,13 @@ toolbar = [
                         children=[
                             dbc.Row([
                                 dbc.Col([
-                                    html.H6("Select x", className="card-title"),
-                                    dcc.Dropdown(
-                                        id='x-col',
-                                        options=[{'label': 'x', 'value': 'x'}, {'label': 'y', 'value': 'y'}],
-                                    )]),
+                                    html.H6("Select x axis", className="card-title"),
+                                    dcc.Dropdown(id='x-col')
+                                    ]),
                                 dbc.Col([
-                                    html.H6("Select y", className="card-title"),
-                                    dcc.Dropdown(
-                                        id='y-col',
-                                        options=[{'label': 'x', 'value': 'x'}, {'label': 'y', 'value': 'y'}],
-                                    )]),
+                                    html.H6("Select y axis", className="card-title"),
+                                    dcc.Dropdown(id='y-col')
+                                    ]),
 
                             ]),
                         ]

@@ -8,6 +8,6 @@ colors:
 graph_config:
   modeBarButtonsToAdd:
     - drawclosedpath
-    - drawcircle
+    # - drawcircle
     - drawrect
     # - eraseshape
