@@ -1,23 +1,19 @@
-from dash import html, dcc, dash_table
+# PyPi imports
+from dash import html, dcc
 import dash_bootstrap_components as dbc
 import yaml
 import pandas as pd
 import numpy as np
 import plotly.express as px
 
+# Load config file
 with open('config.yaml') as config_file:
     configs = yaml.load(config_file, Loader=yaml.Loader)
     
 colors = configs['colors']
 graph_config = configs['graph_config']
 
-size = 20
-x = np.arange(0, size)
-y = np.random.randn(size)
-
-df = pd.DataFrame({'x': x, 'y': y})
-
-fig = px.line(data_frame=df, x="x", y="y")
+fig = px.line(x=[0], y=[0])
 
 fig.update_layout(
     dragmode="drawrect",
@@ -166,15 +162,4 @@ graph = dbc.Card(
             ]
         ) 
 
-data_store = dcc.Store(id="data-store", data=df.assign(label=np.nan).to_json(date_format='iso', orient='split'))
-
-result_dt = dbc.Col([
-            dbc.Card(
-                id='result-card',
-                children=[
-                    dbc.CardHeader("Results"),
-                    dbc.CardBody(
-                        dbc.Table.from_dataframe(pd.DataFrame(), striped=True, bordered=True, hover=True))
-                ]),
-            ],
-            )
+data_store = dcc.Store(id="data-store")

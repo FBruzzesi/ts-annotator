@@ -1,43 +1,78 @@
+# PyPi imports
 from copy import copy
-import dash
-from dash import dash_table
-from dash.dependencies import Input, Output, State, ALL
-import dash_bootstrap_components as dbc
 import pandas as pd
-import numpy as np
 import yaml
 
-from app import app
-from utils import create_result_table, parse_contents, path_to_coords, ray_casting_2d
-from utils import Point, Edge, Poly
+import dash
+from dash import dcc
+from dash.dependencies import Input, Output, State, ALL
 
+# Local imports
+from app import app
+from utils import create_result_table, parse_contents, make_figure, assign_label_mask, check_col_type
+
+# Load config file
 with open('config.yaml') as config_file:
     configs = yaml.load(config_file, Loader=yaml.Loader)
     
 colors = configs['colors']
-# graph_config = configs['graph_config']
 
 
+# Callbacks
 @app.callback(
-    Output("graph-pic", "figure"),
-    Input({"type": "label-color-button", "index": ALL}, "n_clicks_timestamp"),
-    State("graph-pic", "figure"),
+     Output("graph-pic", "figure"),
+    [Input("x-col", "value"),
+     Input("y-col", "value"),
+     Input({"type": "label-color-button", "index": ALL}, "n_clicks_timestamp")],
+    [State("data-store", "data"),
+     State("graph-pic", "figure")],
     prevent_initial_call=True,
 )
-def on_color_change(color_idx, figure):
-    """Changes color of the shape to draw in the graph"""
+def on_axis_or_color_change(xcol, ycol, color_idx, df_jsonified, figure):
+    """
+    Depending on the trigger, either:
+    - Changes the x and y axis of the figure
+    - Changes the color of the shape to draw in the graph
+    """
     
-    if color_idx is None: _idx = 0
+    ctx = dash.callback_context
+
+    # Check what triggered the update
+    if not ctx.triggered: return dash.no_update
+    else: trigger = ctx.triggered[0]['prop_id'].split('.')[0]
+
+    # If x and y axis are selected
+    if (trigger in ["x-col", "y-col"]) and (xcol is not None) and (ycol is not None):
+
+        df = (pd.read_json(df_jsonified, orient='split')
+                .loc[:, [xcol, ycol]]
+            )
+        
+        figure = make_figure(df=df, xcol=xcol, ycol=ycol)
+
+        figure.update_layout(
+            dragmode="drawrect",
+            newshape={"line": {"color": "indianred", "width": 2}}
+            )
+        return figure
+
+    # If new color is selected
+    elif "label-color-button" in trigger:
+
+        if color_idx is None: _idx = 0
+        else:
+            _idx = max(
+                enumerate(color_idx),
+                key=lambda t: 0 if t[1] is None else t[1],
+            )[0]
+
+        color = colors[_idx]
+        figure["layout"]['newshape'] = {"line": {"color": color, "width": 2}}
+
+        return figure
+    
     else:
-        _idx = max(
-            enumerate(color_idx),
-            key=lambda t: 0 if t[1] is None else t[1],
-        )[0]
-
-    color = colors[_idx]
-    figure["layout"]['newshape'] = {"line": {"color": color, "width": 3}}
-
-    return figure
+        return dash.no_update 
 
 
 @app.callback(
@@ -52,62 +87,63 @@ def on_color_change(color_idx, figure):
      State("data-store", "data"),
      State("label", "value"),
      State("data-loader", "children"),
-     State("x-col", "options")],
+     State("x-col", "options"),
+     State("x-col", "value"),
+     State("y-col", "value")],
     prevent_initial_call=True,
 )
-def on_upload_or_annotation(contents, relayout_data, filename, df_jsonified, label, msg, orig_col_options):
-    """labels data inside new annotation"""
+def on_upload_or_annotation(contents, relayout_data, filename, df_jsonified, label, msg, orig_col_options, xcol, ycol):
+    """
+    Depending on the trigger:
+    - Loads and parses the data loaded from a csv/xlsx
+    - Labels data inside new annotation (Rect or Path)
+    """
     
     ctx = dash.callback_context
 
     # Check what triggered the update
     if not ctx.triggered: return dash.no_update
-    else: trigger = ctx.triggered[0]['prop_id'].split('.')[0]
+    else: trigger = ctx.triggered[0]["prop_id"].split(".")[0]
 
+    shapes = relayout_data.get("shapes")
 
+    # Parses the loaded file
     if trigger == "data-loader":
         
         df, msg = parse_contents(contents, filename)
-        col_options = [{'label': c, 'value': c} for c in df.columns]
-        return None, df.to_json(date_format='iso', orient='split'), msg, copy(col_options), copy(col_options)
-
-
-    elif trigger == "graph-pic":
+        cols_to_display = [key for key, value in df.apply(check_col_type).to_dict().items() if value != "categorical"]
+        col_options = [{"label": c, "value": c} for c in cols_to_display]
         
-        dff = pd.read_json(df_jsonified, orient='split')
+        return None, df.to_json(date_format="iso", orient="split"), msg, copy(col_options), copy(col_options)
+
+    # Labels data inside new annotation
+    elif (trigger == "graph-pic") and (shapes is not None):
         
-        shapes = relayout_data.get("shapes")
+        df = pd.read_json(df_jsonified, orient="split")
         shape = shapes[-1]
-        shape_type = shape.get("type")
         
-        # Closed Path
-        if shape_type == 'path': 
-
-            coords = path_to_coords(shape.get("path"))
-
-            poly = Poly(
-                name='closed_shape', 
-                edges = tuple([
-                    Edge(a=Point(x=x0, y=y0), b=Point(x=x1, y=y1)) for (x0, y0), (x1, y1) in zip(coords[:-1], coords[1:])]
-                    )
-                )
-            msk = dff.apply(lambda row: ray_casting_2d(Point(row['x'], row['y']), poly), axis=1)
+        msk = assign_label_mask(df=df, xcol=xcol, ycol=ycol, shape=shape)
         
-        # Rect
-        else: 
-            x0, y0, x1, y1 = shape.get("x0"), shape.get("y0"), shape.get("x1"), shape.get("y1")
+        df.loc[msk, "label"] = label
+        dfj = df.to_json(date_format="iso", orient="split")
 
-            if x0 > x1: x0, x1 = x1, x0
-            if y0 > y1: y0, y1 = y1, y0
-
-            msk = (dff['x'].between(x0, x1)) & (dff['y'].between(y0, y1))
-        
-
-        dff.loc[msk, 'label'] = label
-        dfj = dff.to_json(date_format='iso', orient='split')
-        result_dt = create_result_table(dff)
+        result_dt = create_result_table(df[[xcol, ycol, "label"]])
 
         return result_dt, dfj, msg, copy(orig_col_options), copy(orig_col_options)
     
     else:
         return dash.no_update
+
+
+@app.callback(
+    Output("download-dataframe-csv", "data"),
+    Input("btn-download-results", "n_clicks"),
+    State("data-store", "data"),
+    prevent_initial_call=True,
+)
+def download_results(n_clicks, df_jsonified):
+    """Download data as csv when clicked"""
+
+    if n_clicks:
+        df = pd.read_json(df_jsonified, orient="split")
+        return dcc.send_data_frame(df.to_csv, "result_df.csv", index=False)

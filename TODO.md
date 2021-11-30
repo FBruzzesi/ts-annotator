@@ -5,17 +5,17 @@
 - [❌] Precommit hooks
 ## App
 - Components:
-  - [❌] Instruction
+  - [❌] Instruction & description
   - [✔️] Input Box
   - [✔️] Dropdown for x and y values
 - Functionalities:
-  - [❌] Look for dates
+  - [✔️] Check for dates and dtypes
   - [❌] Check for memory consumption
-  - [❌] Data Export
+  - [✔️] Data Export
 - Restyling
-  - [🚧] Plot
-  - [🚧] Datatable
-  - [🚧] Components
+  - [✔️] Plot
+  - [✔️] Datatable
+  - [✔️] Components
 
 # Legend
 - [✔️] **Done**
