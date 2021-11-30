@@ -1,11 +1,13 @@
-from dash import html, dcc, dash_table
+# PyPi imports
+from dash import html
 import dash_bootstrap_components as dbc
 
+# Local imports
 from app import app
 import callbacks
-from layout import header, toolbar, graph, data_store #description
+from layout import header, toolbar, graph, data_store # description
 
-
+# App layour
 app.layout = html.Div(
     id="layout",
     children=[

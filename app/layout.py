@@ -2,8 +2,6 @@
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 import yaml
-import pandas as pd
-import numpy as np
 import plotly.express as px
 
 # Load config file
