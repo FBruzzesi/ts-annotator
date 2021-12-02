@@ -1,5 +1,5 @@
 # docker build . -t ts-annotator
-# docker run -p 8088:8088 ts-annotator
+# docker run -p 8080:8080 ts-annotator
 FROM python:3.8-slim
 
 COPY requirements.txt .
@@ -14,5 +14,5 @@ RUN pip install --user --no-cache-dir -r requirements.txt \
 COPY app app
 WORKDIR /app
 
-EXPOSE 8088
+EXPOSE 8080
 ENTRYPOINT ["python3", "index.py"]
