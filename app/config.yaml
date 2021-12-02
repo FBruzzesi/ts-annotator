@@ -11,3 +11,7 @@ graph_config:
     # - drawcircle
     - drawrect
     # - eraseshape
+
+xtype_to_mode:
+  numeric: markers
+  datetime: lines

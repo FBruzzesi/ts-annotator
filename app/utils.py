@@ -1,5 +1,5 @@
 # PyPi imports
-import base64, io, sys
+import base64, io, sys, yaml
 from typing import Dict
 from collections import namedtuple
 
@@ -14,10 +14,11 @@ import dash_bootstrap_components as dbc
 from numba import jit
 
 
-xtype_to_mode = {
-    "numeric": "markers",
-    "datetime": "lines"
-}
+# Load config file
+with open('config.yaml') as config_file:
+    configs = yaml.safe_load(config_file)
+    
+xtype_to_mode = configs['xtype_to_mode']
 
 
 def path_to_coords(svg_path: str, xtype: str=None) -> np.array:
@@ -85,7 +86,6 @@ def make_figure(df: pd.DataFrame, xcol: str, ycol: str) -> go.Figure:
     if xtype == "datetime":
         df[xcol] = pd.to_datetime(df[xcol])
 
-    
     figure = go.Figure(
         go.Scattergl(
             x = df[xcol],
@@ -95,10 +95,18 @@ def make_figure(df: pd.DataFrame, xcol: str, ycol: str) -> go.Figure:
                 "line": {
                     "width": 1,
                     "color": "DarkSlateGrey"
+                    }
                 }
-            }
+            )
         )
-    )
+
+    figure.update_layout(
+        height=450,
+        margin=dict(l=80, r=30, t=50, b=50),
+        xaxis_title=xcol,
+        yaxis_title=ycol,
+        template="seaborn"
+        )
 
 
     return figure

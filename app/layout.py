@@ -2,22 +2,27 @@
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 import yaml
-import plotly.express as px
+import plotly.graph_objects as go
 
 # Load config file
 with open('config.yaml') as config_file:
-    configs = yaml.load(config_file, Loader=yaml.Loader)
+    configs = yaml.safe_load(config_file)
     
 colors = configs['colors']
 graph_config = configs['graph_config']
 
-fig = px.line(x=[0], y=[0])
+# Initialize empty figure
+figure = go.Figure()
 
-fig.update_layout(
+figure.update_layout(
+    height=450,
+    margin=dict(l=80, r=30, t=50, b=50),
+    xaxis_title="x-axis",
+    yaxis_title="y-axis",
     dragmode="drawrect",
+    template="seaborn",
     newshape={"line": {"color": "indianred", "width": 2}}
     )
-
 
 # Github link button
 gh_link = dbc.Button(
@@ -111,11 +116,11 @@ toolbar = [
                         children=[
                             dbc.Row([
                                 dbc.Col([
-                                    html.H6("Select x axis", className="card-title"),
+                                    html.H6("Select x-axis", className="card-title"),
                                     dcc.Dropdown(id='x-col')
                                     ]),
                                 dbc.Col([
-                                    html.H6("Select y axis", className="card-title"),
+                                    html.H6("Select y-axis", className="card-title"),
                                     dcc.Dropdown(id='y-col')
                                     ]),
 
@@ -156,7 +161,7 @@ graph = dbc.Card(
         id='fig-card', 
         children=[
             dbc.CardHeader("Graph"),
-            dcc.Graph(id="graph-pic", figure=fig, config=graph_config)
+            dcc.Graph(id="graph-pic", figure=figure, config=graph_config)
             ]
         ) 
 

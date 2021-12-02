@@ -7,7 +7,7 @@ from app import app
 import callbacks
 from layout import header, toolbar, graph, data_store # description
 
-# App layour
+# App layout
 app.layout = html.Div(
     id="layout",
     children=[

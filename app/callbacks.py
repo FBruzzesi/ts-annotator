@@ -13,7 +13,7 @@ from utils import create_result_table, parse_contents, make_figure, assign_label
 
 # Load config file
 with open('config.yaml') as config_file:
-    configs = yaml.load(config_file, Loader=yaml.Loader)
+    configs = yaml.safe_load(config_file)
     
 colors = configs['colors']
 
