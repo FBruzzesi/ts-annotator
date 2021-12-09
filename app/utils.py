@@ -1,7 +1,7 @@
 # PyPi imports
 import base64, io, sys, yaml
 from collections import namedtuple
-from dash import dcc, html
+from dash import dcc, html, dash_table
 import dash_bootstrap_components as dbc
 from numba import jit
 import numpy as np
@@ -156,23 +156,41 @@ def assign_label_mask(df: pd.DataFrame, xcol: str, ycol: str, shape: Dict[str, s
     return msk
 
 
-def create_result_table(df: pd.DataFrame) -> dbc.Col:
+def create_result_table(df: pd.DataFrame, xcol: str, ycol: str) -> dbc.Col:
     """Generates Card for resulting table"""
 
-    result_dt = dbc.Col([
+    df_ = df.loc[:, [xcol, ycol, "label"]]
+
+    result_dt = dash_table.DataTable(
+            id="result-table",
+            columns=[{"name": c, "id": c} for c in df_.columns],
+            fixed_rows={ 'headers': True, 'data': 0 },
+            style_data_conditional=[
+                    {'if': {'column_id': xcol}, 'width': '50px'},
+                    {'if': {'column_id': ycol}, 'width': '50px'},
+                    {'if': {'column_id': 'label'}, 'width': '100px'},
+                ],
+            page_current=0,
+            page_size=50,
+            page_count=0,
+            page_action='custom',
+            virtualization=True,
+        )
+
+    result_div = dbc.Col([
         dbc.Card(
             id='result-card',
             children=[
                 dbc.CardHeader("Results"),
                 dbc.CardBody([
                     dbc.Button([html.I(className="bi bi-cloud-download"), " Download Results"], id="btn-download-results", color="success", className="mt-auto"),
-                    dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True),
+                    result_dt,
                     dcc.Download(id="download-dataframe-csv"),
                 ])
             ]),
         ])
 
-    return result_dt
+    return result_div
 
 
 # Implementation of ray-casting algorithm from https://rosettacode.org/wiki/Ray-casting_algorithm#Python

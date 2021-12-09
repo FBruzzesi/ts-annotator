@@ -45,6 +45,7 @@ def on_axis_or_color_change(xcol, ycol, color_idx, df_jsonified, figure):
 
         df = (pd.read_json(df_jsonified, orient='split')
                 .loc[:, [xcol, ycol]]
+                .sort_values(xcol)
             )
 
         figure = make_figure(df=df, xcol=xcol, ycol=ycol)
@@ -126,7 +127,7 @@ def on_upload_or_annotation(contents, relayout_data, filename, df_jsonified, lab
         df.loc[msk, "label"] = label
         dfj = df.to_json(date_format="iso", orient="split")
 
-        result_dt = create_result_table(df[[xcol, ycol, "label"]])
+        result_dt = create_result_table(df, xcol, ycol)
 
         return result_dt, dfj, msg, copy(orig_col_options), copy(orig_col_options)
 
@@ -146,3 +147,20 @@ def download_results(n_clicks, df_jsonified):
     if n_clicks:
         df = pd.read_json(df_jsonified, orient="split")
         return dcc.send_data_frame(df.to_csv, "result_df.csv", index=False)
+
+
+@app.callback(
+    Output("result-table", "data"),
+    Input("result-table", "page_current"),
+    Input("result-table", "page_size"),
+    State("data-store", "data"),
+    State("x-col", "value")
+)
+def update_table(page_current, page_size, df_jsonified, xcol):
+    """Updates result table on page change"""
+    df_toshow = (pd.read_json(df_jsonified, orient="split")
+                .sort_values(xcol)
+                .iloc[page_current*page_size: (page_current+1)*page_size]
+                .to_dict('records')
+    )
+    return df_toshow
