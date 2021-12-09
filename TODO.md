@@ -8,16 +8,16 @@
   - [❌] Instruction & description
   - [✔️] Input Box
   - [✔️] Dropdown for x and y values
-  - [❌] Add social links
-  - [❌] Check table for large datasets -> make it scrollable or page change within the Container
+  - [✔️] Add social links
+  - [❌] Check table for large datasets (cfr. https://dash.plotly.com/datatable/callbacks and https://dash.plotly.com/datatable/virtualization)
 - Functionalities:
   - [✔️] Check for dates and dtypes
-  - [🚧] Check for memory consumption -> Always using Scattergl for now
+  - [✔️] Check for memory consumption -> Always using Scattergl for now
   - [✔️] Data Export
-- Restyling
+- Styling
   - [✔️] Plot
-  - [✔️] Datatable
   - [✔️] Components
+  - [❌] Datatable
 
 # Legend
 - [✔️] **Done**

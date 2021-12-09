@@ -24,15 +24,6 @@ figure.update_layout(
     newshape={"line": {"color": "indianred", "width": 2}}
     )
 
-# Github link button
-gh_link = dbc.Button(
-    "View Source Code",
-    outline=True,
-    color="warning",
-    href="https://github.com/FBruzzesi/ts-annotator",
-    id="gh-link",
-    style={"text-transform": "none"},
-)
 
 # Header Container
 header = dbc.Container(
@@ -42,13 +33,9 @@ header = dbc.Container(
         dbc.Row(
             children=[
                 dbc.Col(
-                    children=[html.Div([html.H3("Time Series Annotator App")], id="app-title")],
+                    children=[html.Div([html.H3(["Time Series Annotator App ", html.I(className="bi bi-pencil-square")])], id="app-title")],
                     align="center",
                     width={"offset": 4},
-                    ),
-                dbc.Col(
-                    children=[dbc.NavItem(gh_link)],
-                    align="center",
                     ),
                 ],
             ),
@@ -98,7 +85,7 @@ toolbar = [
             dbc.CardBody(
                 style={"justify": 'center', "align": 'center'},
                 children=[
-                    html.H6("Load Data", className="card-title"),
+                    html.H6([html.I(className="bi bi-cloud-upload"), " Load Data"], className="card-title"),
                     dcc.Upload(
                         id='data-loader',
                         children=['Drag and Drop or ', html.A('Select a File')],
@@ -116,14 +103,13 @@ toolbar = [
                         children=[
                             dbc.Row([
                                 dbc.Col([
-                                    html.H6("Select x-axis", className="card-title"),
+                                    html.H6([html.I(className="bi bi-arrow-left-right"), " Select x-axis"], className="card-title"),
                                     dcc.Dropdown(id='x-col')
                                     ]),
                                 dbc.Col([
-                                    html.H6("Select y-axis", className="card-title"),
+                                    html.H6([html.I(className="bi bi-arrow-down-up"), " Select y-axis"], className="card-title"),
                                     dcc.Dropdown(id='y-col')
                                     ]),
-
                             ]),
                         ]
                     )
@@ -135,10 +121,10 @@ toolbar = [
             dbc.CardBody(
                 style={"justify": 'center', "align": 'center'},
                 children=[
-                    html.H6("Label Value", className="card-title"),
+                    html.H6([html.I(className="bi-pencil"), " Label Value"], className="card-title"),
                     dcc.Input(id="label"),
                     html.Hr(),
-                    html.H6("Select Color", className="card-title"),
+                    html.H6([html.I(className="bi-palette"), " Select Color"], className="card-title"),
                     html.Div(
                         id="label-color-button",
                         children=[
@@ -150,11 +136,11 @@ toolbar = [
                             )
                             for _idx, c in enumerate(colors)
                         ],
-                        ),
-                    ]
-                ),
-            ],
-        ),
+                    ),
+                ]
+            ),
+        ],
+    ),
 ]
 
 graph = dbc.Card(
@@ -166,3 +152,64 @@ graph = dbc.Card(
         ) 
 
 data_store = dcc.Store(id="data-store")
+
+
+# Github link button
+github = dbc.Button(
+    [html.I(className="bi bi-github"), " Github"],
+    outline=True,
+    href="https://github.com/FBruzzesi/ts-annotator",
+    id="gh-link",
+    external_link=True,
+    style={"text-transform": "none"},
+)
+# Report a Bug link button
+report_bug = dbc.Button(
+    [html.I(className="bi bi-bug-fill"), " Report a Bug"],
+    outline=True,
+    href="https://github.com/FBruzzesi/ts-annotator/issues",
+    id="bug-link",
+    external_link=True,
+    style={"text-transform": "none"},
+)
+
+
+
+# Linkedin link button
+linkedin = dbc.Button(
+    [html.I(className="bi bi-linkedin"), " Linkedin"],
+    outline=True,
+    href="https://linkedin.com/in/francesco-bruzzesi/",
+    id="linkedin-link",
+    external_link=True,
+    style={"text-transform": "none"},
+)
+# StackOverflow link button
+stackoverflow = dbc.Button(
+    [html.I(className="bi bi-stack"), " Stackoverflow"],
+    outline=True,
+    href="https://stackoverflow.com/users/12411536/fbruzzesi",
+    id="so-link",
+    external_link=True,
+    style={"text-transform": "none"},
+)
+
+# Support link button
+support = dbc.Button(
+    [html.I(className="bi bi-cup-fill"), " Buy me a coffee"],
+    outline=True,
+    href="https://ko-fi.com/francescobruzzesi",
+    id="support-link",
+    external_link=True,
+    style={"text-transform": "none"},
+)
+
+social_container = dbc.Container(
+    id="social",
+    children=[
+        github,
+        report_bug,
+        linkedin,
+        stackoverflow,
+        support]
+)

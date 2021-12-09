@@ -5,7 +5,7 @@ import dash_bootstrap_components as dbc
 # Local imports
 from app import app
 import callbacks
-from layout import header, toolbar, graph, data_store # description
+from layout import header, toolbar, graph, data_store, social_container # description
 
 # App layout
 app.layout = html.Div(
@@ -23,7 +23,8 @@ app.layout = html.Div(
                  )
             ],
             fluid=True),
-        dbc.Container(id="table")
+        dbc.Container(id="table"),
+        social_container
     ]
 )
 

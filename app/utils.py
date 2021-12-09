@@ -1,17 +1,14 @@
 # PyPi imports
 import base64, io, sys, yaml
-from typing import Dict
 from collections import namedtuple
-
+from dash import dcc, html
+import dash_bootstrap_components as dbc
+from numba import jit
+import numpy as np
 import pandas as pd
 from pandas.api.types import is_numeric_dtype as is_numeric
-import numpy as np
 import plotly.graph_objects as go
-
-from dash import dcc
-import dash_bootstrap_components as dbc
-
-from numba import jit
+from typing import Dict
 
 
 # Load config file
@@ -34,6 +31,7 @@ def path_to_coords(svg_path: str, xtype: str=None) -> np.array:
 
 def parse_contents(contents, filename):
     """Parse '.csv' or '.xls' file"""
+
     _, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     
@@ -108,17 +106,16 @@ def make_figure(df: pd.DataFrame, xcol: str, ycol: str) -> go.Figure:
         template="seaborn"
         )
 
-
     return figure
 
 
-def dt_series_to_unix(s: pd.Series):
+def dt_series_to_unix(s: pd.Series) -> pd.Series:
     """Converts datetime series to unix int"""
 
     try:
         s = pd.to_datetime(s)
         return (s - pd.Timestamp("1970-01-01")) // pd.Timedelta("1s")
-    
+
     except:
         raise TypeError 
 
@@ -127,10 +124,10 @@ def assign_label_mask(df: pd.DataFrame, xcol: str, ycol: str, shape: Dict[str, s
     """Assign label from given annotation"""
     shape_type = shape.get("type")
     xtype = check_col_type(df[xcol])
-    
+
     # Closed Path
-    if shape_type == 'path': 
-        
+    if shape_type == 'path':
+
         coords = path_to_coords(shape.get("path"), xtype=xtype)
 
         poly = Poly(
@@ -141,14 +138,14 @@ def assign_label_mask(df: pd.DataFrame, xcol: str, ycol: str, shape: Dict[str, s
             )
 
         xtype = check_col_type(df[xcol])
-        
+
         xnew = "x_tmp"
         df[xnew] = dt_series_to_unix(df[xcol]) if xtype == "datetime" else df[xcol]
         msk = df.apply(lambda row: ray_casting_2d(Point(row[xnew], row[ycol]), poly), axis=1)
         df.drop(xnew, axis=1, inplace=True)
-        
+
     # Rect
-    else: 
+    else:
         x0, y0, x1, y1 = shape.get("x0"), shape.get("y0"), shape.get("x1"), shape.get("y1")
 
         if x0 > x1: x0, x1 = x1, x0
@@ -159,7 +156,7 @@ def assign_label_mask(df: pd.DataFrame, xcol: str, ycol: str, shape: Dict[str, s
     return msk
 
 
-def create_result_table(df: pd.DataFrame):
+def create_result_table(df: pd.DataFrame) -> dbc.Col:
     """Generates Card for resulting table"""
 
     result_dt = dbc.Col([
@@ -168,7 +165,7 @@ def create_result_table(df: pd.DataFrame):
             children=[
                 dbc.CardHeader("Results"),
                 dbc.CardBody([
-                    dbc.Button("Download Results", id="btn-download-results", color="success", className="mt-auto"),
+                    dbc.Button([html.I(className="bi bi-cloud-download"), " Download Results"], id="btn-download-results", color="success", className="mt-auto"),
                     dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True),
                     dcc.Download(id="download-dataframe-csv"),
                 ])
@@ -177,20 +174,22 @@ def create_result_table(df: pd.DataFrame):
 
     return result_dt
 
+
 # Implementation of ray-casting algorithm from https://rosettacode.org/wiki/Ray-casting_algorithm#Python
 
 Point = namedtuple('Point', 'x, y')      # Point
 Edge = namedtuple('Edge', 'a, b')        # Polygon edge from a to b
 Poly = namedtuple('Poly', 'name, edges') # Polygon
- 
+
 _eps = 0.00000001
 _huge = sys.float_info.max
 _tiny = sys.float_info.min
 
+
 @jit
 def rayintersectseg(p: Point, edge: Edge) -> bool:
     """Takes a point p=Point() and an edge of two endpoints a=Point(), b=Point() of a line segment returns boolean"""
-    
+
     a, b = edge
     if a.y > b.y:
         a, b = b, a
@@ -219,10 +218,12 @@ def rayintersectseg(p: Point, edge: Edge) -> bool:
 
     return intersect
 
+
 @jit
 def _odd(x: int) -> bool:
     """Checks if integer is odd"""
     return x%2 == 1
+
 
 @jit
 def ray_casting_2d(p: Point, poly: Poly) -> bool:

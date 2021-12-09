@@ -2,7 +2,6 @@
 from copy import copy
 import pandas as pd
 import yaml
-
 import dash
 from dash import dcc
 from dash.dependencies import Input, Output, State, ALL
@@ -14,13 +13,13 @@ from utils import create_result_table, parse_contents, make_figure, assign_label
 # Load config file
 with open('config.yaml') as config_file:
     configs = yaml.safe_load(config_file)
-    
+
 colors = configs['colors']
 
 
 # Callbacks
 @app.callback(
-     Output("graph-pic", "figure"),
+    Output("graph-pic", "figure"),
     [Input("x-col", "value"),
      Input("y-col", "value"),
      Input({"type": "label-color-button", "index": ALL}, "n_clicks_timestamp")],
@@ -34,7 +33,7 @@ def on_axis_or_color_change(xcol, ycol, color_idx, df_jsonified, figure):
     - Changes the x and y axis of the figure
     - Changes the color of the shape to draw in the graph
     """
-    
+
     ctx = dash.callback_context
 
     # Check what triggered the update
@@ -47,7 +46,7 @@ def on_axis_or_color_change(xcol, ycol, color_idx, df_jsonified, figure):
         df = (pd.read_json(df_jsonified, orient='split')
                 .loc[:, [xcol, ycol]]
             )
-        
+
         figure = make_figure(df=df, xcol=xcol, ycol=ycol)
 
         figure.update_layout(
@@ -70,9 +69,9 @@ def on_axis_or_color_change(xcol, ycol, color_idx, df_jsonified, figure):
         figure["layout"]['newshape'] = {"line": {"color": color, "width": 2}}
 
         return figure
-    
+
     else:
-        return dash.no_update 
+        return dash.no_update
 
 
 @app.callback(
@@ -98,7 +97,7 @@ def on_upload_or_annotation(contents, relayout_data, filename, df_jsonified, lab
     - Loads and parses the data loaded from a csv/xlsx
     - Labels data inside new annotation (Rect or Path)
     """
-    
+
     ctx = dash.callback_context
 
     # Check what triggered the update
@@ -118,19 +117,19 @@ def on_upload_or_annotation(contents, relayout_data, filename, df_jsonified, lab
 
     # Labels data inside new annotation
     elif (trigger == "graph-pic") and (shapes is not None):
-        
+
         df = pd.read_json(df_jsonified, orient="split")
         shape = shapes[-1]
-        
+
         msk = assign_label_mask(df=df, xcol=xcol, ycol=ycol, shape=shape)
-        
+
         df.loc[msk, "label"] = label
         dfj = df.to_json(date_format="iso", orient="split")
 
         result_dt = create_result_table(df[[xcol, ycol, "label"]])
 
         return result_dt, dfj, msg, copy(orig_col_options), copy(orig_col_options)
-    
+
     else:
         return dash.no_update
 
