@@ -15,3 +15,16 @@ graph_config:
 xtype_to_mode:
   numeric: markers
   datetime: lines
+
+table_style:
+  cell_width: 400
+  table_height: 660
+  header:
+    backgroundColor: rgb(210, 210, 210)
+    color: black
+    fontWeight: bold
+    textAlign: center
+  data:
+    backgroundColor: white
+    color: black
+                

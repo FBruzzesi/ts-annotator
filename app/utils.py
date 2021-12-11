@@ -3,7 +3,7 @@ import base64, io, sys, yaml
 from collections import namedtuple
 from dash import dcc, html, dash_table
 import dash_bootstrap_components as dbc
-from numba import jit
+from numba import njit
 import numpy as np
 import pandas as pd
 from pandas.api.types import is_numeric_dtype as is_numeric
@@ -12,10 +12,11 @@ from typing import Dict
 
 
 # Load config file
-with open('config.yaml') as config_file:
+with open("config.yaml") as config_file:
     configs = yaml.safe_load(config_file)
     
-xtype_to_mode = configs['xtype_to_mode']
+xtype_to_mode = configs["xtype_to_mode"]
+table_style = configs["table_style"]
 
 
 def path_to_coords(svg_path: str, xtype: str=None) -> np.array:
@@ -36,21 +37,21 @@ def parse_contents(contents, filename):
     decoded = base64.b64decode(content_string)
     
     default_df = pd.DataFrame()
-    default_msg = 'There was a problem with the file'
+    default_msg = "There was a problem with the file"
 
-    if 'csv' in filename:
+    if "csv" in filename:
         # Assume that the user uploaded a CSV file
         try:
-            df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
-            return df, f'Loaded {filename} successfully'
+            df = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
+            return df, f"Loaded {filename} successfully"
 
         except: return default_df, default_msg
     
-    elif 'xls' in filename:
+    elif "xls" in filename:
         # Assume that the user uploaded an excel file
         try:
             df = pd.read_excel(io.BytesIO(decoded))
-            return df, f'Loaded {filename} successfully'
+            return df, f"Loaded {filename} successfully"
 
         except: return default_df, default_msg
 
@@ -126,12 +127,12 @@ def assign_label_mask(df: pd.DataFrame, xcol: str, ycol: str, shape: Dict[str, s
     xtype = check_col_type(df[xcol])
 
     # Closed Path
-    if shape_type == 'path':
+    if shape_type == "path":
 
         coords = path_to_coords(shape.get("path"), xtype=xtype)
 
         poly = Poly(
-            name='closed_shape', 
+            name="closed_shape", 
             edges = tuple([
                 Edge(a=Point(x=x0, y=y0), b=Point(x=x1, y=y1)) for (x0, y0), (x1, y1) in zip(coords[:-1], coords[1:])]
                 )
@@ -156,41 +157,59 @@ def assign_label_mask(df: pd.DataFrame, xcol: str, ycol: str, shape: Dict[str, s
     return msk
 
 
-def create_result_table(df: pd.DataFrame, xcol: str, ycol: str) -> dbc.Col:
+def create_result_card(df: pd.DataFrame, xcol: str, ycol: str) -> dbc.Col:
     """Generates Card for resulting table"""
 
-    df_ = df.loc[:, [xcol, ycol, "label"]]
+    fixed_cols = [xcol, ycol, "label"]
 
     result_dt = dash_table.DataTable(
-            id="result-table",
-            columns=[{"name": c, "id": c} for c in df_.columns],
-            fixed_rows={ 'headers': True, 'data': 0 },
-            style_data_conditional=[
-                    {'if': {'column_id': xcol}, 'width': '50px'},
-                    {'if': {'column_id': ycol}, 'width': '50px'},
-                    {'if': {'column_id': 'label'}, 'width': '100px'},
-                ],
-            page_current=0,
-            page_size=50,
-            page_count=0,
-            page_action='custom',
-            virtualization=True,
+            data = df.loc[:, fixed_cols].to_dict("records"),
+            id = "result-table",
+            columns = [{"name": c, "id": c} for c in fixed_cols],
+            fixed_rows = {"headers": True, "data": 0},
+            style_header = table_style["header"],
+            style_table = {
+                    "height": table_style["table_height"],  # 20 rows
+                    "minHeight": table_style["table_height"],
+                    "maxHeight": table_style["table_height"], 
+                    "overflowY": "auto",
+            },
+            style_cell = {
+                "minWidth": table_style["cell_width"],
+                "maxWidth": table_style["cell_width"],
+                "width": table_style["cell_width"],
+            },
+            style_data = table_style["data"],
+            style_data_conditional = [{"if": {"row_index": "odd"}, "backgroundColor": "rgb(220, 220, 220)"}],
+            page_current = 0,
+            page_size = 250,
+            page_count = 0,
+            page_action = "custom",
+            virtualization = True,
         )
 
-    result_div = dbc.Col([
-        dbc.Card(
-            id='result-card',
-            children=[
-                dbc.CardHeader("Results"),
-                dbc.CardBody([
-                    dbc.Button([html.I(className="bi bi-cloud-download"), " Download Results"], id="btn-download-results", color="success", className="mt-auto"),
+    result_card = dbc.Card(
+        id="result-card",
+        children=[
+            dbc.CardHeader("Results"),
+            dbc.CardBody(
+                children=[
+                    dbc.Button(
+                        children=[
+                            html.I(className="bi bi-cloud-download"),
+                            " Download Results"
+                            ],
+                        id="btn-download-results",
+                        color="success",
+                        className="mt-auto",
+                        style={"margin-bottom": "10px"}
+                    ),
                     result_dt,
                     dcc.Download(id="download-dataframe-csv"),
-                ])
-            ]),
+            ])
         ])
 
-    return result_div
+    return result_card
 
 
 # Implementation of ray-casting algorithm from https://rosettacode.org/wiki/Ray-casting_algorithm#Python
@@ -204,23 +223,23 @@ _huge = sys.float_info.max
 _tiny = sys.float_info.min
 
 
-@jit
+@njit(fastmath=True)
 def rayintersectseg(p: Point, edge: Edge) -> bool:
     """Takes a point p=Point() and an edge of two endpoints a=Point(), b=Point() of a line segment returns boolean"""
 
     a, b = edge
+
     if a.y > b.y:
         a, b = b, a
 
     if (p.y == a.y) or (p.y == b.y):
         p = Point(p.x, p.y + _eps)
 
-    intersect = False
 
     if (p.y > b.y or p.y < a.y) or (p.x > max(a.x, b.x)):
-        return False
+        intersect = False
 
-    if p.x < min(a.x, b.x):
+    elif p.x < min(a.x, b.x):
         intersect = True
 
     else:
@@ -232,18 +251,19 @@ def rayintersectseg(p: Point, edge: Edge) -> bool:
             m_blue = (p.y - a.y) / float(p.x - a.x)
         else:
             m_blue = _huge
+        
         intersect = m_blue >= m_red
 
     return intersect
 
 
-@jit
+@njit(fastmath=True)
 def _odd(x: int) -> bool:
     """Checks if integer is odd"""
     return x%2 == 1
 
 
-@jit
+@njit(fastmath=True)
 def ray_casting_2d(p: Point, poly: Poly) -> bool:
     """Implements ray-casting algorithm to check if a point p is inside a (closed) polygon poly"""
     intersections = [int(rayintersectseg(p, edge)) for edge in poly.edges]

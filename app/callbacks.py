@@ -8,13 +8,13 @@ from dash.dependencies import Input, Output, State, ALL
 
 # Local imports
 from app import app
-from utils import create_result_table, parse_contents, make_figure, assign_label_mask, check_col_type
+from utils import create_result_card, parse_contents, make_figure, assign_label_mask, check_col_type
 
 # Load config file
-with open('config.yaml') as config_file:
+with open("config.yaml") as config_file:
     configs = yaml.safe_load(config_file)
 
-colors = configs['colors']
+colors = configs["colors"]
 
 
 # Callbacks
@@ -38,12 +38,12 @@ def on_axis_or_color_change(xcol, ycol, color_idx, df_jsonified, figure):
 
     # Check what triggered the update
     if not ctx.triggered: return dash.no_update
-    else: trigger = ctx.triggered[0]['prop_id'].split('.')[0]
+    else: trigger = ctx.triggered[0]["prop_id"].split(".")[0]
 
     # If x and y axis are selected
     if (trigger in ["x-col", "y-col"]) and (xcol is not None) and (ycol is not None):
 
-        df = (pd.read_json(df_jsonified, orient='split')
+        df = (pd.read_json(df_jsonified, orient="split")
                 .loc[:, [xcol, ycol]]
                 .sort_values(xcol)
             )
@@ -127,9 +127,9 @@ def on_upload_or_annotation(contents, relayout_data, filename, df_jsonified, lab
         df.loc[msk, "label"] = label
         dfj = df.to_json(date_format="iso", orient="split")
 
-        result_dt = create_result_table(df, xcol, ycol)
+        result_card = create_result_card(df, xcol, ycol)
 
-        return result_dt, dfj, msg, copy(orig_col_options), copy(orig_col_options)
+        return result_card, dfj, msg, copy(orig_col_options), copy(orig_col_options)
 
     else:
         return dash.no_update
@@ -161,6 +161,6 @@ def update_table(page_current, page_size, df_jsonified, xcol):
     df_toshow = (pd.read_json(df_jsonified, orient="split")
                 .sort_values(xcol)
                 .iloc[page_current*page_size: (page_current+1)*page_size]
-                .to_dict('records')
+                .to_dict("records")
     )
     return df_toshow
