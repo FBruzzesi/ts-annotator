@@ -1,7 +1,5 @@
 # PyPi imports
-import base64
-import io
-import sys
+import base64, io, sys
 from collections import namedtuple
 from typing import Dict
 
@@ -10,12 +8,10 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import yaml
-from dash import dash_table
-from dash import dcc
-from dash import html
+
+from dash import dcc, html, dash_table
 from numba import jit
 from pandas.api.types import is_numeric_dtype as is_numeric
-
 
 # Load config file
 with open("config.yaml") as config_file:

@@ -1,14 +1,10 @@
 # PyPi imports
-import callbacks
-import dash_bootstrap_components as dbc
 from dash import html
-from layout import annotate_row
-from layout import data_store
-from layout import header
-from layout import table_row
 
-from app import app
 # Local imports
+from app import app
+import callbacks
+from layout import header, annotate_row, table_row, data_store
 
 # App layout
 app.layout = html.Div(

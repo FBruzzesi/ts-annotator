@@ -16,7 +16,3 @@ repos:
     rev: 7638d0035a770dd67283b7d464e4db3c0043f609
     hooks:
     -   id: python-no-eval
--   repo: https://github.com/asottile/reorder_python_imports
-    rev: v2.6.0
-    hooks:
-    -   id: reorder-python-imports

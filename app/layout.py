@@ -1,9 +1,8 @@
 # PyPi imports
+from dash import dcc, html
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import yaml
-from dash import dcc
-from dash import html
 
 # Load config file
 with open('config.yaml') as config_file:
