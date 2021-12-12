@@ -22,12 +22,16 @@
   - [✔️] Check for memory consumption
   - [✔️] Data Export
 
-- Styling
+- Styling:
   - [✔️] Plot
   - [✔️] Components
   - [✔️] Result Table
 
-- Stress Test [❌]
+- Deploy:
+  - [❌] Stress Test
+  - [❌] License file (repo)
+  - [❌] Procfile
+  - [❌] runtime.txt
 
 ## Legend
 
