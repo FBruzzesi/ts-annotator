@@ -6,15 +6,15 @@
 
 - [✔️] Add requirements.txt file
 - [✔️] Add dockerfile for reproducibility
-- [❌] Precommit hooks
+- [✔️] Precommit hooks
 
 ### App
 
 - Components:
-  - [❌] Instruction & description
+  - [🚧] Instruction & description
   - [✔️] Input Box
   - [✔️] Dropdown for x and y values
-  - [🚧] Add social links
+  - [✔️] Add social links
   - [✔️] Table virtualization for large datasets
 
 - Functionalities:
@@ -26,6 +26,8 @@
   - [✔️] Plot
   - [✔️] Components
   - [✔️] Result Table
+
+- Stress Test [❌]
 
 ## Legend
 

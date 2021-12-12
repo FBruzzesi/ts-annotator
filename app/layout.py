@@ -1,82 +1,129 @@
 # PyPi imports
-from dash import html, dcc
 import dash_bootstrap_components as dbc
-import yaml
 import plotly.graph_objects as go
+import yaml
+from dash import dcc
+from dash import html
 
 # Load config file
 with open('config.yaml') as config_file:
     configs = yaml.safe_load(config_file)
-    
+
 colors = configs["colors"]
 graph_config = configs["graph_config"]
+graph_layout = configs["graph_layout"]
+
+with open('description.md') as description_file:
+    description = description_file.read()
 
 # Initialize empty figure
 figure = go.Figure()
 
 figure.update_layout(
-    height=450,
-    margin=dict(l=80, r=30, t=50, b=50),
     xaxis_title="x-axis",
     yaxis_title="y-axis",
     dragmode="drawrect",
-    template="seaborn",
-    newshape={"line": {"color": "indianred", "width": 2}}
+    newshape={"line": {"color": "indianred", "width": 2}},
+    **graph_layout
     )
 
 
+social_style = {"color": "white", "margin-bottom": "50px"}
+
+# Github link button
+github = dbc.Button(
+    [html.I(className="bi bi-github"), " Github"],
+    outline=True,
+    href="https://github.com/FBruzzesi/ts-annotator",
+    id="gh-link",
+    external_link=True,
+    style=social_style,
+)
+
+# Report a Bug link button
+report_bug = dbc.Button(
+    [html.I(className="bi bi-bug-fill"), " Report a Bug"],
+    outline=True,
+    href="https://github.com/FBruzzesi/ts-annotator/issues",
+    id="bug-link",
+    external_link=True,
+    style=social_style,
+)
+
+# Linkedin link button
+linkedin = dbc.Button(
+    [html.I(className="bi bi-linkedin"), " Linkedin"],
+    outline=True,
+    href="https://linkedin.com/in/francesco-bruzzesi/",
+    id="linkedin-link",
+    external_link=True,
+    style=social_style,
+)
+
+# StackOverflow link button
+stackoverflow = dbc.Button(
+    [html.I(className="bi bi-stack"), " Stackoverflow"],
+    outline=True,
+    href="https://stackoverflow.com/users/12411536/fbruzzesi",
+    id="so-link",
+    external_link=True,
+    style=social_style,
+)
+
+# Support link button
+support = dbc.Button(
+    [html.I(className="bi bi-cup-fill"), " Buy me a coffee"],
+    outline=True,
+    href="https://ko-fi.com/francescobruzzesi",
+    id="support-link",
+    external_link=True,
+    style=social_style,
+)
+
+social_container = dbc.Container(
+        id="social",
+        children=[
+            github,
+            report_bug,
+            linkedin,
+            stackoverflow,
+            support]
+    )
+
 # Header Container
-header = dbc.Container(
+header = html.Div(
     id="app-header",
-    fluid=True,
     children=[
         dbc.Row(
             children=[
                 dbc.Col(
-                    children=[html.Div([html.H3(["Time Series Annotator App ", html.I(className="bi bi-pencil-square")])], id="app-title")],
+                    children=[html.Div([html.H3(["Tabular Data Annotator ", html.I(className="bi bi-pencil-square")])], id="app-title")],
                     align="center",
-                    width={"offset": 4},
-                    ),
-                ],
-            ),
-        ],
-    )
+                    width={"offset": 3},
+                    style={"margin-top": 15}
+                ),
+                dbc.Col(
+                    children=social_container,
+                    align="center",
+                    width={"size": 5, "offset": 7},
+                    style={"margin-top": -35}
+                ),
+            ],
+        )
+    ]
+)
 
 
-# description_md = """Interactive app for (tabular) data annotation.
 
-#     - Load data as csv
-#     - Select x and y column to plot
-#     - Input label/target value
-#     - Select data in the graph
-# """
-
-# # Description
-# description = dbc.Col(
-#     [
-#         dbc.Card(
-#             id="description-card",
-#             children=[
-#                 dbc.CardHeader("How does it work?!"),
-#                 dbc.CardBody(
-#                     [
-#                         dbc.Row(
-#                             [
-#                                 dbc.Col(
-#                                     dcc.Markdown(description_md),
-#                                     md=True,
-#                                 ),
-#                             ]
-#                         ),
-#                     ]
-#                 ),
-#             ],
-#         )
-#     ],
-#     md=3,
-# )
 
 toolbar = [
+    dbc.Card(
+            id="description-card",
+            children=[
+                dbc.CardHeader("How it works!"),
+                dbc.CardBody([dcc.Markdown(description)]),
+            ],
+        ),
     dbc.Card(
         id="loader-card",
         children=[
@@ -120,22 +167,27 @@ toolbar = [
                 dbc.CardBody(
                     style={"justify": 'center', "align": 'center'},
                     children=[
-                        html.H6([html.I(className="bi-pencil"), " Label Value"], className="card-title"),
-                        dcc.Input(id="label"),
-                        html.Hr(),
-                        html.H6([html.I(className="bi-palette"), " Select Color"], className="card-title"),
-                        html.Div(
-                            id="label-color-button",
-                            children=[
-                                dbc.Button(
-                                    "",
-                                    id={"type": "label-color-button", "index": _idx},
-                                    style={"background-color": c},
-                                    size="lg",className="me-1"
-                                )
-                                for _idx, c in enumerate(colors)
-                            ],
-                        ),
+                        dbc.Row([
+                            dbc.Col([
+                                html.H6([html.I(className="bi-pencil"), " Label Value"], className="card-title"),
+                                dcc.Input(id="label"),
+                            ]),
+                            dbc.Col([
+                                html.H6([html.I(className="bi-palette"), " Select Color"], className="card-title"),
+                                html.Div(
+                                    id="label-color-button",
+                                    children=[
+                                        dbc.Button(
+                                            "",
+                                            id={"type": "label-color-button", "index": _idx},
+                                            style={"background-color": c},
+                                            size="lg",className="me-1"
+                                        )
+                                        for _idx, c in enumerate(colors)
+                                    ],
+                                ),
+                            ])
+                        ])
                     ]
                 ),
             ],
@@ -143,72 +195,25 @@ toolbar = [
 ]
 
 graph = dbc.Card(
-    id='fig-card', 
+    id='fig-card',
     children=[
         dbc.CardHeader("Graph"),
         dcc.Graph(id="graph-pic", figure=figure, config=graph_config)
     ]
 )
 
+annotate_row = dbc.Container(
+    fluid=True,
+    id="annotate-row",
+    children=[
+        dbc.Row([
+            dbc.Col(toolbar, md=3),
+            dbc.Col(graph, md=9)
+            ]
+        )
+    ]
+)
+
+table_row = dbc.Container(id="table")
+
 data_store = dcc.Store(id="data-store")
-
-
-# Github link button
-github = dbc.Button(
-    [html.I(className="bi bi-github"), " Github"],
-    outline=True,
-    href="https://github.com/FBruzzesi/ts-annotator",
-    id="gh-link",
-    external_link=True,
-    style={"text-transform": "none"},
-)
-
-# Report a Bug link button
-report_bug = dbc.Button(
-    [html.I(className="bi bi-bug-fill"), " Report a Bug"],
-    outline=True,
-    href="https://github.com/FBruzzesi/ts-annotator/issues",
-    id="bug-link",
-    external_link=True,
-    style={"text-transform": "none"},
-)
-
-# Linkedin link button
-linkedin = dbc.Button(
-    [html.I(className="bi bi-linkedin"), " Linkedin"],
-    outline=True,
-    href="https://linkedin.com/in/francesco-bruzzesi/",
-    id="linkedin-link",
-    external_link=True,
-    style={"text-transform": "none"},
-)
-
-# StackOverflow link button
-stackoverflow = dbc.Button(
-    [html.I(className="bi bi-stack"), " Stackoverflow"],
-    outline=True,
-    href="https://stackoverflow.com/users/12411536/fbruzzesi",
-    id="so-link",
-    external_link=True,
-    style={"text-transform": "none"},
-)
-
-# Support link button
-support = dbc.Button(
-    [html.I(className="bi bi-cup-fill"), " Buy me a coffee"],
-    outline=True,
-    href="https://ko-fi.com/francescobruzzesi",
-    id="support-link",
-    external_link=True,
-    style={"text-transform": "none"},
-)
-
-social_container = dbc.Container(
-        id="social",
-        children=[
-            github,
-            report_bug,
-            linkedin,
-            stackoverflow,
-            support]
-    )

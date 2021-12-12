@@ -1,34 +1,25 @@
 # PyPi imports
-from dash import html
-import dash_bootstrap_components as dbc
-
-# Local imports
-from app import app
 import callbacks
-from layout import header, toolbar, graph, data_store, social_container # description
+import dash_bootstrap_components as dbc
+from dash import html
+from layout import annotate_row
+from layout import data_store
+from layout import header
+from layout import table_row
+
+from app import app
+# Local imports
 
 # App layout
 app.layout = html.Div(
     id="layout",
     children=[
         header,
+        annotate_row,
+        table_row,
         data_store,
-        dbc.Container([
-            #  dbc.Row(description),
-            dbc.Row(
-                children=[
-                    dbc.Col(toolbar, md=3),
-                    dbc.Col(graph, md=9)
-                    ]
-                 )
-            ],
-            fluid=True),
-        dbc.Container(id="table"),
-        social_container
     ]
 )
-
-
 
 if __name__ == "__main__":
     app.run_server(

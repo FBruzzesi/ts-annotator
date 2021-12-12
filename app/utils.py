@@ -13,7 +13,7 @@ import yaml
 from dash import dash_table
 from dash import dcc
 from dash import html
-from numba import njit
+from numba import jit
 from pandas.api.types import is_numeric_dtype as is_numeric
 
 
@@ -23,6 +23,7 @@ with open("config.yaml") as config_file:
 
 xtype_to_mode = configs["xtype_to_mode"]
 table_style = configs["table_style"]
+graph_layout = configs["graph_layout"]
 
 
 def path_to_coords(svg_path: str, xtype: str = None) -> np.array:
@@ -106,11 +107,9 @@ def make_figure(df: pd.DataFrame, xcol: str, ycol: str) -> go.Figure:
         )
 
     figure.update_layout(
-        height=450,
-        margin=dict(l=80, r=30, t=50, b=50),
         xaxis_title=xcol,
         yaxis_title=ycol,
-        template="seaborn"
+        **graph_layout
         )
 
     return figure
@@ -229,7 +228,7 @@ _huge = sys.float_info.max
 _tiny = sys.float_info.min
 
 
-@njit(fastmath=True)
+@jit(fastmath=True)
 def rayintersectseg(p: Point, edge: Edge) -> bool:
     """Takes a point p=Point() and an edge of two endpoints a=Point(), b=Point() of a line segment returns boolean"""
 
@@ -263,13 +262,13 @@ def rayintersectseg(p: Point, edge: Edge) -> bool:
     return intersect
 
 
-@njit(fastmath=True)
+@jit(fastmath=True)
 def _odd(x: int) -> bool:
     """Checks if integer is odd"""
     return x%2 == 1
 
 
-@njit(fastmath=True)
+@jit(fastmath=True)
 def ray_casting_2d(p: Point, poly: Poly) -> bool:
     """Implements ray-casting algorithm to check if a point p is inside a (closed) polygon poly"""
     intersections = [int(rayintersectseg(p, edge)) for edge in poly.edges]
