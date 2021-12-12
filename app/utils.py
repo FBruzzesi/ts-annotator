@@ -1,25 +1,31 @@
 # PyPi imports
-import base64, io, sys, yaml
+import base64
+import io
+import sys
 from collections import namedtuple
-from dash import dcc, html, dash_table
+from typing import Dict
+
 import dash_bootstrap_components as dbc
-from numba import njit
 import numpy as np
 import pandas as pd
-from pandas.api.types import is_numeric_dtype as is_numeric
 import plotly.graph_objects as go
-from typing import Dict
+import yaml
+from dash import dash_table
+from dash import dcc
+from dash import html
+from numba import njit
+from pandas.api.types import is_numeric_dtype as is_numeric
 
 
 # Load config file
 with open("config.yaml") as config_file:
     configs = yaml.safe_load(config_file)
-    
+
 xtype_to_mode = configs["xtype_to_mode"]
 table_style = configs["table_style"]
 
 
-def path_to_coords(svg_path: str, xtype: str=None) -> np.array:
+def path_to_coords(svg_path: str, xtype: str = None) -> np.array:
     """From SVG path to numpy array of coordinates, each row being a (row, col) point"""
     indices_str = [
         pt.replace("M", "").replace("Z", "").replace("_", " ").split(",") for pt in svg_path.split("L")
@@ -35,7 +41,7 @@ def parse_contents(contents, filename):
 
     _, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
-    
+
     default_df = pd.DataFrame()
     default_msg = "There was a problem with the file"
 
@@ -46,7 +52,7 @@ def parse_contents(contents, filename):
             return df, f"Loaded {filename} successfully"
 
         except: return default_df, default_msg
-    
+
     elif "xls" in filename:
         # Assume that the user uploaded an excel file
         try:
@@ -69,7 +75,7 @@ def check_col_type(s: pd.Series) -> str:
             pd.to_datetime(s)
             return "datetime"
 
-        except Exception as e:
+        except:
             return "categorical"
 
 
@@ -118,7 +124,7 @@ def dt_series_to_unix(s: pd.Series) -> pd.Series:
         return (s - pd.Timestamp("1970-01-01")) // pd.Timedelta("1s")
 
     except:
-        raise TypeError 
+        raise TypeError
 
 
 def assign_label_mask(df: pd.DataFrame, xcol: str, ycol: str, shape: Dict[str, str]):
@@ -132,7 +138,7 @@ def assign_label_mask(df: pd.DataFrame, xcol: str, ycol: str, shape: Dict[str, s
         coords = path_to_coords(shape.get("path"), xtype=xtype)
 
         poly = Poly(
-            name="closed_shape", 
+            name="closed_shape",
             edges = tuple([
                 Edge(a=Point(x=x0, y=y0), b=Point(x=x1, y=y1)) for (x0, y0), (x1, y1) in zip(coords[:-1], coords[1:])]
                 )
@@ -171,7 +177,7 @@ def create_result_card(df: pd.DataFrame, xcol: str, ycol: str) -> dbc.Col:
             style_table = {
                     "height": table_style["table_height"],  # 20 rows
                     "minHeight": table_style["table_height"],
-                    "maxHeight": table_style["table_height"], 
+                    "maxHeight": table_style["table_height"],
                     "overflowY": "auto",
             },
             style_cell = {
@@ -205,7 +211,7 @@ def create_result_card(df: pd.DataFrame, xcol: str, ycol: str) -> dbc.Col:
                         style={"margin-bottom": "10px"}
                     ),
                     result_dt,
-                    dcc.Download(id="download-dataframe-csv"),
+                    dcc.Download(id="download-dataframe-csv")
             ])
         ])
 
@@ -251,7 +257,7 @@ def rayintersectseg(p: Point, edge: Edge) -> bool:
             m_blue = (p.y - a.y) / float(p.x - a.x)
         else:
             m_blue = _huge
-        
+
         intersect = m_blue >= m_red
 
     return intersect
