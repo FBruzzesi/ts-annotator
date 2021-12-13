@@ -2,7 +2,7 @@
 
 ## What it is
 
-Source code for [tabular data annotator](insert heroku link) webapp, built using [plotly dash](https://plotly.com/dash/). Originally it was intended for time series data, hence the repo's name.
+Source code for [tabular data annotator](insert heroku link) webapp hosted on [Heroku](https://www.heroku.com/), built using [plotly dash](https://plotly.com/dash/). Originally it was intended for time series data, hence the repo's name.
 
 ## How it works
 
@@ -31,5 +31,5 @@ docker run -p 8080:8080 ts-annotator
 Issues and feedbacks are more than welcome
 
 ## Support
-<a href='https://ko-fi.com/L3L37807E' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi2.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/L3L37807E)
