@@ -2,7 +2,7 @@
 from dash import html
 
 # Local imports
-from app import app
+from app import app, application
 import callbacks
 from layout import header, annotate_row, table_row, data_store
 
