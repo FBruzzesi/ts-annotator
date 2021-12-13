@@ -14,7 +14,7 @@ from numba import jit
 from pandas.api.types import is_numeric_dtype as is_numeric
 
 # Load config file
-with open("config.yaml") as config_file:
+with open("app/config.yaml") as config_file:
     configs = yaml.safe_load(config_file)
 
 xtype_to_mode = configs["xtype_to_mode"]

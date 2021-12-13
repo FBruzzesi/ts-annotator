@@ -11,7 +11,7 @@ from app import app
 from utils import create_result_card, parse_contents, make_figure, assign_label_mask, check_col_type
 
 # Load config file
-with open("config.yaml") as config_file:
+with open("app/config.yaml") as config_file:
     configs = yaml.safe_load(config_file)
 
 colors = configs["colors"]
@@ -109,11 +109,11 @@ def on_upload_or_annotation(contents, relayout_data, filename, df_jsonified, lab
 
     # Parses the loaded file
     if trigger == "data-loader":
-        
+
         df, msg = parse_contents(contents, filename)
         cols_to_display = [key for key, value in df.apply(check_col_type).to_dict().items() if value != "categorical"]
         col_options = [{"label": c, "value": c} for c in cols_to_display]
-        
+
         return None, df.to_json(date_format="iso", orient="split"), msg, copy(col_options), copy(col_options)
 
     # Labels data inside new annotation

@@ -27,4 +27,4 @@ clean-folders:
 interrogate:
 	interrogate -vv --ignore-module --ignore-init-method --ignore-private --ignore-magic --fail-under=80 app/
 
-precommit: clean-nb clean-folders interrogate
+precommit: clean-folders interrogate

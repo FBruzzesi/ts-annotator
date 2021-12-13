@@ -1,3 +1,4 @@
+# How to run it: gunicorn --pythonpath app index:server
 # PyPi imports
 from dash import html
 

@@ -5,14 +5,14 @@ import plotly.graph_objects as go
 import yaml
 
 # Load config file
-with open('config.yaml') as config_file:
+with open('app/config.yaml') as config_file:
     configs = yaml.safe_load(config_file)
 
 colors = configs["colors"]
 graph_config = configs["graph_config"]
 graph_layout = configs["graph_layout"]
 
-with open('description.md') as description_file:
+with open('app/description.md') as description_file:
     description = description_file.read()
 
 # Initialize empty figure
