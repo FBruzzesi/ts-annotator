@@ -15,6 +15,7 @@ with open("app/config.yaml") as config_file:
     configs = yaml.safe_load(config_file)
 
 colors = configs["colors"]
+graph_layout = configs["graph_layout"]
 
 
 # Callbacks
@@ -51,8 +52,8 @@ def on_axis_or_color_change(xcol, ycol, color_idx, df_jsonified, figure):
         figure = make_figure(df=df, xcol=xcol, ycol=ycol)
 
         figure.update_layout(
-            dragmode="drawrect",
-            newshape={"line": {"color": "indianred", "width": 2}}
+            newshape={"line": {"color": "indianred", "width": 2}},
+            **graph_layout
             )
         return figure
 

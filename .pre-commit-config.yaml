@@ -16,3 +16,8 @@ repos:
     rev: 7638d0035a770dd67283b7d464e4db3c0043f609
     hooks:
     -   id: python-no-eval
+-   repo: https://github.com/econchick/interrogate
+    rev: 1.5.0
+    hooks:
+    -   id: interrogate
+        args: [-vv, --ignore-module, --ignore-init-method, --ignore-private, --ignore-magic, --fail-under=80, app/]

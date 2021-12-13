@@ -90,10 +90,10 @@ def make_figure(df: pd.DataFrame, xcol: str, ycol: str) -> go.Figure:
 
     figure = go.Figure(
         go.Scattergl(
-            x = df[xcol],
-            y = df[ycol],
-            mode = xtype_to_mode[xtype],
-            marker = {
+            x=df[xcol],
+            y=df[ycol],
+            mode=xtype_to_mode[xtype],
+            marker={
                 "line": {
                     "width": 1,
                     "color": "DarkSlateGrey"

@@ -1,4 +1,6 @@
-# How to run it: gunicorn --pythonpath app index:server
+# Run it locally with by:
+# $ gunicorn --bind 127.0.0.1:8000 --pythonpath app index:server
+
 # PyPi imports
 from dash import html
 

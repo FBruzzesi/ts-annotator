@@ -21,7 +21,6 @@ figure = go.Figure()
 figure.update_layout(
     xaxis_title="x-axis",
     yaxis_title="y-axis",
-    dragmode="drawrect",
     newshape={"line": {"color": "indianred", "width": 2}},
     **graph_layout
     )

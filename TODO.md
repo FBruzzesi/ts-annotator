@@ -29,9 +29,9 @@
 
 - Deploy:
   - [❌] Stress Test
-  - [❌] License file (repo)
-  - [❌] Procfile
-  - [❌] runtime.txt
+  - [✔️] License file (repo)
+  - [✔️] Procfile
+  - [✔️] runtime.txt
 
 ## Legend
 

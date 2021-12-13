@@ -24,7 +24,11 @@ clean-nb:
 clean-folders:
 	rm -rf .ipynb_checkpoints __pycache__ .pytest_cache */.ipynb_checkpoints */__pycache__ */.pytest_cache
 
+clean-docker:
+	docker container prune --force
+	docker image prune --force
+
 interrogate:
 	interrogate -vv --ignore-module --ignore-init-method --ignore-private --ignore-magic --fail-under=80 app/
 
-precommit: clean-folders interrogate
+precommit: clean-folders clean-docker interrogate
